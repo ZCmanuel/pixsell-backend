@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
-class Usuario extends Model implements JWTSubject
+class Usuario extends Authenticatable implements JWTSubject
 {
     protected $table = 'usuarios';
     protected $primaryKey = 'id_usuario';
 
-    protected $fillable = ['nombre', 'email', 'contraseña', 'rol'];
+    protected $fillable = [
+        'nombre',
+        'email',
+        'contraseña',
+        'rol'
+    ];
 
     /**
      * Relación uno a muchos con la tabla Album
@@ -23,8 +28,9 @@ class Usuario extends Model implements JWTSubject
     }
 
 
-    /**
-     *  Metoodo de JWT para obtener el identificador del usuario 
+    /*
+     * Devuelve el identificador único del usuario (para el token)
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Cancion, Usuario>
      */
     public function getJWTIdentifier()
     {
@@ -32,11 +38,17 @@ class Usuario extends Model implements JWTSubject
     }
 
     /**
-     * Método de JWT para obtener las reclamaciones personalizadas
+     * Devuelve cualquier información adicional que quieras incluir en el token (opcional)
      * @return array
      */
     public function getJWTCustomClaims()
     {
-        return [];
+        return []; // Puedes añadir "rol" u otros datos aquí
     }
+
+    public function getAuthPassword()
+    {
+        return $this->contraseña;
+    }
+
 }
