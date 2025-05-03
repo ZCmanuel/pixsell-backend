@@ -9,7 +9,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-
     /**
      * Autentica al usuario y genera un token JWT, de lo contrario, retorna un error 401 Unauthorized.
      * 
@@ -38,9 +37,11 @@ class AuthController extends Controller
      */
     public function me()
     {
-        /** @var \Tymon\JWTAuth\JWTGuard $auth */
-        $auth = auth();
-        return response()->json($auth->user());
+        /** @var \App\Models\Usuario $user */
+        $user = auth()->user();
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     /**
