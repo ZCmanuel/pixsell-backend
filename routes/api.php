@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\IsUserAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -9,8 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 
 // ----------- RUTAS PROTEGIDAS --------------
-// Ruta para obtener la información del usuario autenticado -> Token JWT 
-Route::get('/me', [AuthController::class, 'me']); // Obtiene el usuario autenticado
-// Ruta para cerrar sesión -> Token JWT
-Route::post('/logout', [AuthController::class, 'logout']); // Cierra la sesión del usuario
-
+Route::middleware([IsUserAuth::class])->group(function(){
+    Route::get('/me', [AuthController::class, 'me']); // Obtiene el usuario autenticado
+    Route::post('/logout', [AuthController::class, 'logout']); // Cierra la sesión del usuario
+});

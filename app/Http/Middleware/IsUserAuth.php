@@ -15,6 +15,18 @@ class IsUserAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        try {
+            if (auth('api')->user()) {
+                return $next($request);
+            } else {
+                return response()->json(['message' => 'No autenticado'], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al autenticar',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
+ 
