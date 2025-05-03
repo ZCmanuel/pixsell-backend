@@ -15,7 +15,7 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth('api')->user() && auth('api')->user()->role === 'admin') {
+        if (auth('api')->user() && auth('api')->user()->role === 'fotógrafo') {
             return $next($request);
         } else {
             return response()->json(['message' => 'No autorizado'], 403);
