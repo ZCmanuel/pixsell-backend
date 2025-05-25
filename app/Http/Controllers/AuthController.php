@@ -40,8 +40,8 @@ class AuthController extends Controller
 
         // $token = JWTAuth::fromUser($usuario); // Generar un token JWT para el nuevo usuario (opcional)
         // return response()->json(['token' => $token], 201); // Retornar el token (opcional)
-        
-        return response()->json(['message' => 'Usuario registrado correctamente'], 201); 
+
+        return response()->json(['message' => 'Usuario registrado correctamente'], 201);
     }
 
     /**
@@ -61,7 +61,17 @@ class AuthController extends Controller
             return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
 
-        return response()->json(['token' => $token]);
+        $user = auth()->user();
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id_usuario,
+                'nombre' => $user->nombre,
+                'email' => $user->email,
+                'rol' => $user->rol,
+            ],
+            'token' => $token
+        ]);
     }
     /**
      * Retorna la información del usuario autenticado (JWT).
