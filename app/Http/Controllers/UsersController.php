@@ -95,4 +95,49 @@ class UsersController
 
         return response()->json(['message' => 'Usuario actualizado correctamente', 'usuario' => $usuario], 200);
     }
+
+    /**
+     * Actualiza los datos del usuario autenticado.
+     * ENDPOINT: /api/user/update
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateMe(Request $request)
+    {
+        $usuario = auth()->user(); // Obtener el usuario autenticado
+
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+
+        try {
+            // Validar los datos de entrada
+            $validatedData = $request->validate([
+                'nombre' => 'sometimes|string|max:255',
+                'contraseña_actual' => 'required_with:contraseña|string|min:10', // Requerida si se envía una nueva contraseña
+                'contraseña' => 'sometimes|string|min:10|confirmed', // Nueva contraseña debe ser confirmada
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        }
+
+        // Validar la contraseña actual antes de permitir el cambio de contraseña
+        if (isset($validatedData['contraseña']) && !\Hash::check($validatedData['contraseña_actual'], $usuario->contraseña)) {
+            return response()->json(['message' => 'La contraseña actual no es correcta'], 403);
+        }
+
+        // Actualizar los campos del usuario
+        $updateData = [];
+        if (isset($validatedData['nombre'])) {
+            $updateData['nombre'] = $validatedData['nombre'];
+        }
+        if (isset($validatedData['contraseña'])) {
+            $updateData['contraseña'] = bcrypt($validatedData['contraseña']);
+        }
+
+        $usuario->update($updateData);
+
+        return response()->json(['message' => 'Usuario actualizado correctamente', 'usuario' => $usuario], 200);
+    }
 }

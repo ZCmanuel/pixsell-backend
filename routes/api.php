@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\AlbumsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UsersController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsUserAuth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // ENDPOINTS DE AUTENTICACIÓN
@@ -16,15 +16,18 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware([IsUserAuth::class])->group(function () {
     Route::get('/me', [AuthController::class, 'me']); // Obtiene el usuario autenticado
     Route::post('/logout', [AuthController::class, 'logout']); // Cierra la sesión del usuario
+    Route::put('/user/update', [UsersController::class, 'updateMe']); // Actualiza el usuario autenticado
 });
 
+// ----------- RUTAS DE ADMIN --------------
 Route::middleware([IsUserAuth::class, IsAdmin::class])->group(function () {
+    // ENDPOINTS DE USUARIOS
     Route::get('admin/users', [UsersController::class, 'users']); // Obtiene todos los usuarios
     Route::get('admin/users/{id}', [UsersController::class, 'show']); // Obtiene un usuario por ID
     Route::put('admin/users/{id}', [UsersController::class, 'update']); // Actualiza un usuario
+
+    // ENDPOINTS DE ALBUMES
+    Route::get('admin/albums', [AlbumsController::class, 'albums']); // Obtiene todos los usuarios
+
 });
 
-// ----------- RUTAS ADMINISTRADOR --------------
-// Route::middleware([IsAdmin::class])->group(function () {
-//     Route::get('admin/users', [AuthController::class, 'users']); // Obtiene todos los usuarios
-// });
