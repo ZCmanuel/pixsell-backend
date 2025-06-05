@@ -74,6 +74,25 @@ class AlbumsController
         ]);
     }
 
+    public function getUserAlbums(Request $request)
+    {
+        // Obtener el usuario autenticado
+        $usuario = $request->user();
+
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Obtener los álbumes del usuario autenticado
+        $albumes = Album::where('id_usuario', $usuario->id_usuario)
+            ->orderBy('created_at', 'DESC') // Ordenar de más recientes a menos recientes
+            ->get();
+
+        return response()->json([
+            'albums' => $albumes,
+        ]);
+    }
+
     /**
      * Crea un nuevo álbum con imágenes asociadas.
      * ENDPOINT: /api/admin/albums/ -> POST

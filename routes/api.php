@@ -20,6 +20,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::put('/user/update', [UsersController::class, 'updateMe']); // Actualiza el usuario autenticado
 
     // ENDPOINTS DE ALBUMES
+    Route::get('/user/albums', [AlbumsController::class, 'getUserAlbums']); // Lista los álbumes del usuario autenticado
 
     // ENDPONTS ESTADÍSTICAS
     route::get('/estadisticas/albums', [DataController::class, 'userAlbumStats']); // Obtiene estadísticas de álbumes
