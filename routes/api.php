@@ -18,6 +18,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::get('/me', [AuthController::class, 'me']); // Obtiene el usuario autenticado
     Route::post('/logout', [AuthController::class, 'logout']); // Cierra la sesión del usuario
     Route::put('/user/update', [UsersController::class, 'updateMe']); // Actualiza el usuario autenticado
+
+    // ENDPOINTS DE ALBUMES
+
+    // ENDPONTS ESTADÍSTICAS
+    route::get('/estadisticas/albums', [DataController::class, 'userAlbumStats']); // Obtiene estadísticas de álbumes
 });
 
 // ----------- RUTAS DE ADMIN --------------

@@ -65,4 +65,28 @@ class DataController
             'usuarios_por_semana' => $usuariosPorSemana,
         ]);
     }
+
+
+    public function userAlbumStats(Request $request)
+    {
+        // Obtener el usuario autenticado
+        $usuario = $request->user();
+
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Número total de álbumes del usuario
+        $totalAlbumes = \App\Models\Album::where('id_usuario', $usuario->id_usuario)->count();
+
+        // Número de álbumes en estado "pendiente"
+        $albumesPendientes = \App\Models\Album::where('id_usuario', $usuario->id_usuario)
+            ->where('estado', 'pendiente')
+            ->count();
+
+        return response()->json([
+            'total_albumes' => $totalAlbumes,
+            'albumes_pendientes' => $albumesPendientes,
+        ]);
+    }
 }
