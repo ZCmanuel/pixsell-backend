@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AlbumsController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DataController;
 use App\Http\Controllers\UsersController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsUserAuth;
@@ -30,5 +31,9 @@ Route::middleware([IsUserAuth::class, IsAdmin::class])->group(function () {
     Route::get('admin/albums', [AlbumsController::class, 'albums']); // Obtiene todos los usuarios
     Route::post('admin/albums', [AlbumsController::class, 'createAlbum']); // Crea un nuevo álbum
     Route::get('/admin/albums/{id_usuario}', [AlbumsController::class, 'getAlbumsByUser']);
+
+    // ENDPOINTS DE ESTADÍSTICAS
+    Route::get('admin/estadisticas/albums', [DataController::class, 'albumEstads']); // Obtiene estadísticas de álbumes
+    Route::get('admin/estadisticas/users', [DataController::class, 'usersEstads']); // Obtiene estadísticas de usuarios
 });
 
