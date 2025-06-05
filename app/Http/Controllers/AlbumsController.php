@@ -12,7 +12,7 @@ class AlbumsController
 {
     /**
      * Lista todos los álbumes con paginación, filtros y ordenación.
-     * ENDPOINT: /api/albums
+     * ENDPOINT: /api/admin/albums -> GET
      * 
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -50,7 +50,37 @@ class AlbumsController
         ]);
     }
 
+    /**
+     *  Obtiene los álbumes de un usuario.
+     * ENDPOINT: /api/admi/albums/{id_usuario} -> GET
+     * @param int $id_usuario
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function getAlbumsByUser(int $id_usuario)
+    {
+        // Verificar que el usuario exista
+        $usuario = \App\Models\Usuario::find($id_usuario);
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
 
+        // Obtener los álbumes del usuario ordenados de más recientes a menos recientes
+        $albumes = Album::where('id_usuario', $id_usuario)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        return response()->json([
+            'albums' => $albumes,
+        ]);
+    }
+
+    /**
+     * Crea un nuevo álbum con imágenes asociadas.
+     * ENDPOINT: /api/admin/albums/ -> POST
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function createAlbum(Request $request)
     {
         // Validar los datos de entrada
