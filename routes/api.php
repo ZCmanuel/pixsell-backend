@@ -29,6 +29,6 @@ Route::middleware([IsUserAuth::class, IsAdmin::class])->group(function () {
     // ENDPOINTS DE ALBUMES
     Route::get('admin/albums', [AlbumsController::class, 'albums']); // Obtiene todos los usuarios
     Route::post('admin/albums', [AlbumsController::class, 'createAlbum']); // Crea un nuevo álbum
-
+    Route::get('/admin/albums/{id_usuario}', [AlbumsController::class, 'getAlbumsByUser']);
 });
 
