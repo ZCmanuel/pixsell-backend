@@ -7,6 +7,7 @@ use App\Models\Album;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Multimedia;
+use App\Models\Seleccion;
 
 class AlbumsController
 {
@@ -218,6 +219,72 @@ class AlbumsController
         }
 
         return $validator->validated();
+    }
+
+    /**
+     * Guarda las imágenes seleccionadas por el usuario en la tabla selecciones
+     * y actualiza el estado del álbum a "seleccionado".
+     * ENDPOINT: /api/albums/{id_album}/select-images -> POST
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id_album
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function selectImages(Request $request, int $id_album)
+    {
+        $usuario = $request->user(); // Obtener el usuario autenticado
+
+        // Validar que el usuario tenga acceso al álbum
+        $album = Album::where('id_album', $id_album)
+            ->where(function ($query) use ($usuario) {
+                if ($usuario->rol === 'cliente') {
+                    $query->where('id_usuario', $usuario->id_usuario);
+                }
+            })
+            ->first();
+
+        if (!$album) {
+            return response()->json(['error' => 'Álbum no encontrado o no tienes permiso para acceder a él'], 403);
+        }
+
+        // Validar los datos de entrada
+        $validatedData = $request->validate([
+            'imagenes' => 'required|array', // Validar que se envíe un array de IDs de imágenes
+            'imagenes.*' => 'exists:multimedia,id_multimedia', // Validar que cada ID exista en la tabla multimedia
+        ]);
+
+        try {
+            // Guardar las imágenes seleccionadas en la tabla selecciones
+            $selecciones = [];
+            foreach ($validatedData['imagenes'] as $id_multimedia) {
+                // Evitar duplicados en la tabla selecciones
+                if (!Seleccion::where('id_album', $id_album)->where('id_multimedia', $id_multimedia)->exists()) {
+                    $selecciones[] = [
+                        'id_album' => $id_album,
+                        'id_multimedia' => $id_multimedia,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
+
+            // Insertar las selecciones en la base de datos
+            Seleccion::insert($selecciones);
+
+            // Actualizar el estado del álbum a "seleccionado"
+            $album->update(['estado' => 'seleccionado']);
+
+            return response()->json([
+                'message' => 'Imágenes seleccionadas correctamente y estado del álbum actualizado a "seleccionado".',
+                'selecciones' => $selecciones,
+                'album' => [
+                    'id_album' => $album->id_album,
+                    'estado' => $album->estado,
+                ],
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al guardar las selecciones: ' . $e->getMessage()], 500);
+        }
     }
 
     /**

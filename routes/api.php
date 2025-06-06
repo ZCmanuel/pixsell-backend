@@ -22,6 +22,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
     // ENDPOINTS DE ALBUMES
     Route::get('/user/albums', [AlbumsController::class, 'getUserAlbums']); // Lista los álbumes del usuario autenticado
     Route::get('/album/{id}', [AlbumsController::class, 'getAlbumById']); // Obtiene albumes por id
+    Route::post('/albums/seleccion/{id_album}', [AlbumsController::class, 'selectImages']);
 
     // ENDPONTS ESTADÍSTICAS
     route::get('/estadisticas/albums', [DataController::class, 'userAlbumStats']); // Obtiene estadísticas de álbumes
