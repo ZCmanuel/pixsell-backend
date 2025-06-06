@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id('id_album');  // Clave primaria
             $table->unsignedBigInteger('id_usuario');  // Relación con la tabla usuarios
             $table->string('nombre', 150); // Nombre del álbum
-            $table->enum('estado', ['pendiente', 'seleccionado', '‹'])->default('pendiente'); // Estado del álbum
+            $table->enum('estado', allowed: ['pendiente', 'seleccionado', '‹'])->default('pendiente'); // Estado del álbum
             $table->foreign('id_usuario')->references('id_usuario')->on('usuarios');  // Clave foránea hacia usuarios
             $table->timestamps();  // Created at, updated at
         });

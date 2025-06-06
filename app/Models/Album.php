@@ -9,7 +9,7 @@ class Album extends Model
     protected $table = 'albumes';
     protected $primaryKey = 'id_album';
 
-    protected $fillable = ['id_usuario', 'nombre', 'fecha_creacion', 'fecha_act', 'estado'];
+    protected $fillable = ['id_usuario', 'nombre', 'descripcion', 'fecha_creacion', 'fecha_act', 'estado'];
 
     public function usuario()
     {

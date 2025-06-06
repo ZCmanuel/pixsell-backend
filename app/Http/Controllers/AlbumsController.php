@@ -74,6 +74,12 @@ class AlbumsController
         ]);
     }
 
+    /**
+     * Obtiene los álbumes del usuario autenticado.
+     * ENDPOINT: /api/user/albums -> GET
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function getUserAlbums(Request $request)
     {
         // Obtener el usuario autenticado
@@ -124,6 +130,71 @@ class AlbumsController
             // Capturar cualquier excepción y devolver un error 500
             return response()->json(['error' => 'Error al crear el álbum: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Obtiene un álbum por su ID con todos sus datos.
+     * ENDPOINT: /api/albums/{id_album} -> GET
+     *
+     * @param int $id_album
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAlbumById(Request $request, int $id_album)
+    {
+        $usuario = $request->user(); // Obtener el usuario autenticado
+
+        // Verificar si el usuario es cliente
+        if ($usuario->rol === 'cliente') {
+            // Buscar el álbum del cliente por ID
+            $album = Album::with(['multimedia', 'selecciones.multimedia'])
+                ->where('id_usuario', $usuario->id_usuario)
+                ->find($id_album);
+
+            if (!$album) {
+                return response()->json(['error' => 'Álbum no encontrado o no tienes permiso para acceder a él'], 403);
+            }
+        } else if ($usuario->rol === 'fotógrafo') {
+            // Si es administrador, puede acceder a cualquier álbum
+            $album = Album::with(['multimedia', 'selecciones.multimedia'])
+                ->find($id_album);
+
+            if (!$album) {
+                return response()->json(['error' => 'Álbum no encontrado'], 404);
+            }
+        } else {
+            // Si el rol no es válido, devolver un error
+            return response()->json(['error' => 'No tienes permiso para acceder a este recurso'], 403);
+        }
+        // Formatear la respuesta
+        return response()->json([
+            'id_album' => $album->id_album,
+            'nombre' => $album->nombre,
+            'descripcion' => $album->descripcion,
+            'estado' => $album->estado,
+            'created_at' => $album->created_at,
+            'updated_at' => $album->updated_at,
+            'imagenes' => $album->multimedia->map(function ($media) {
+                return [
+                    'id_multimedia' => $media->id_multimedia,
+                    'ruta_archivo' => $media->ruta_archivo,
+                    'url' => $media->url,
+                    'tipo' => $media->tipo,
+                ];
+            }),
+            'seleccionadas' => $album->selecciones->map(function ($seleccion) {
+                return [
+                    'id_seleccion' => $seleccion->id_seleccion,
+                    'id_multimedia' => $seleccion->id_multimedia,
+                    'id_album' => $seleccion->id_album,
+                    'multimedia' => [
+                        'id_multimedia' => $seleccion->multimedia->id_multimedia,
+                        'ruta_archivo' => $seleccion->multimedia->ruta_archivo,
+                        'url' => $seleccion->multimedia->url,
+                        'tipo' => $seleccion->multimedia->tipo,
+                    ],
+                ];
+            }),
+        ]);
     }
 
     /**
