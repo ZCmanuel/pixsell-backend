@@ -288,6 +288,38 @@ class AlbumsController
     }
 
     /**
+     * Cambia el estado de un álbum a "finalizado".
+     * ENDPOINT: /api/albums/{id_album}/finalize -> PATCH
+     *
+     * @param int $id_album
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function finalizeAlbum(int $id_album)
+    {
+        // Buscar el álbum por ID
+        $album = Album::find($id_album);
+
+        if (!$album) {
+            return response()->json(['error' => 'Álbum no encontrado'], 404);
+        }
+
+        try {
+            // Cambiar el estado del álbum a "finalizado"
+            $album->update(['estado' => 'finalizado']);
+
+            return response()->json([
+                'message' => 'Estado del álbum actualizado a "finalizado".',
+                'album' => [
+                    'id_album' => $album->id_album,
+                    'estado' => $album->estado,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al actualizar el estado del álbum: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Crea un registro de álbum en la base de datos.
      *
      * @param array $data
