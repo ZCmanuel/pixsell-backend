@@ -39,7 +39,7 @@ Route::middleware([IsUserAuth::class, IsAdmin::class])->group(function () {
     Route::get('admin/albums', action: [AlbumsController::class, 'albums']); // Obtiene todos los albumes
     Route::post('admin/albums', [AlbumsController::class, 'createAlbum']); // Crea un nuevo álbum
     Route::get('admin/albums/{id_usuario}', [AlbumsController::class, 'getAlbumsByUser']); // Obtiene álbumes por ID de usuario
-    Route::patch('/albums/{id_album}/finalize', [AlbumsController::class, 'finalizeAlbum']);
+    Route::patch('/albums/finalice/{id_album}', [AlbumsController::class, 'finalizeAlbum']);
 
     // ENDPOINTS DE ESTADÍSTICAS
     Route::get('admin/estadisticas/albums', [DataController::class, 'albumEstads']); // Obtiene estadísticas de álbumes
