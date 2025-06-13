@@ -1,61 +1,177 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pixsell Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Requisitos previos
 
-## About Laravel
+Asegúrate de tener instalados los siguientes programas en tu sistema:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Git](https://git-scm.com/)
+- [Composer](https://getcomposer.org/)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Pasos para clonar y configurar el proyecto
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Clona este repositorio:
 
-## Learning Laravel
+   ```bash
+   git clone <URL_DEL_REPOSITORIO>
+   cd pixsell-backend
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. Copia el archivo de ejemplo `.env.example` y renómbralo a `.env`:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+   ```bash
+   cp .env.example .env
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Configura las variables de entorno en el archivo `.env` según tus necesidades. Aquí tienes un ejemplo básico:
 
-## Laravel Sponsors
+   ```env
+   APP_NAME=Pixsell
+   APP_ENV=local
+   APP_KEY=base64:GENERATE_UNA_CLAVE_AQUI
+   APP_DEBUG=true
+   APP_URL=http://localhost
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+   LOG_CHANNEL=stack
 
-### Premium Partners
+   DB_CONNECTION=mysql
+   DB_HOST=mysql
+   DB_PORT=3306
+   DB_DATABASE=pixsell
+   DB_USERNAME=root
+   DB_PASSWORD=root
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+   BROADCAST_DRIVER=log
+   CACHE_DRIVER=file
+   QUEUE_CONNECTION=sync
+   SESSION_DRIVER=file
+   SESSION_LIFETIME=120
 
-## Contributing
+   REDIS_HOST=redis
+   REDIS_PASSWORD=null
+   REDIS_PORT=6379
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+   MAIL_MAILER=smtp
+   MAIL_HOST=mailpit
+   MAIL_PORT=1025
+   MAIL_USERNAME=null
+   MAIL_PASSWORD=null
+   MAIL_ENCRYPTION=null
+   MAIL_FROM_ADDRESS="hello@example.com"
+   MAIL_FROM_NAME="${APP_NAME}"
 
-## Code of Conduct
+   MEILISEARCH_HOST=http://meilisearch:7700
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. Levanta los contenedores de Docker:
 
-## Security Vulnerabilities
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. Ejecuta las migraciones y los seeders para preparar la base de datos:
 
-## License
+   ```bash
+   ./vendor/bin/sail artisan migrate --seed
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. Crea el enlace simbólico para el almacenamiento:
+
+   ```bash
+   ./vendor/bin/sail artisan storage:link
+   ```
+
+## Endpoints clave
+
+### Autenticación
+
+- **Login**: `POST /api/login`
+  ```json
+  {
+    "email": "usuario@example.com",
+    "password": "contraseña"
+  }
+  ```
+
+- **Registro**: `POST /api/register`
+  ```json
+  {
+    "name": "Usuario",
+    "email": "usuario@example.com",
+    "password": "contraseña",
+    "password_confirmation": "contraseña"
+  }
+  ```
+
+### CRUD de Álbumes
+
+- **Crear Álbum**: `POST /api/albumes`
+  ```json
+  {
+    "nombre": "Vacaciones",
+    "descripcion": "Fotos de las vacaciones en la playa."
+  }
+  ```
+
+- **Obtener Álbum por ID**: `GET /api/albumes/{id}`
+
+- **Actualizar Álbum**: `PUT /api/albumes/{id}`
+  ```json
+  {
+    "nombre": "Vacaciones Actualizado",
+    "descripcion": "Fotos actualizadas."
+  }
+  ```
+
+- **Eliminar Álbum**: `DELETE /api/albumes/{id}`
+
+### Selección de Imágenes
+
+- **Seleccionar Imágenes**: `POST /api/albumes/{id}/selecciones`
+  ```json
+  {
+    "imagenes": [1, 2, 3]
+  }
+  ```
+
+- **Finalizar Álbum**: `POST /api/albumes/{id}/finalizar`
+
+## Troubleshooting
+
+### Errores comunes
+
+- **Permisos de almacenamiento**: Si encuentras problemas con los permisos, asegúrate de que el directorio `storage` tiene los permisos correctos:
+  ```bash
+  chmod -R 775 storage bootstrap/cache
+  ```
+
+- **CORS**: Si tienes problemas de CORS, revisa la configuración en `config/cors.php`.
+
+- **Migraciones**: Si las migraciones fallan, verifica que las variables de entorno de la base de datos estén configuradas correctamente.
+
+## Notas adicionales
+
+- Accede a Mailpit en [http://localhost:8025](http://localhost:8025) para ver los correos enviados.
+- Accede a Meilisearch en [http://localhost:7700](http://localhost:7700) para gestionar el motor de búsqueda.
+
+## Despliegue en producción
+
+1. Configura las variables de entorno para producción en el archivo `.env`.
+2. Ejecuta las migraciones en el servidor:
+
+   ```bash
+   php artisan migrate --force
+   ```
+
+3. Crea el enlace simbólico para el almacenamiento:
+
+   ```bash
+   php artisan storage:link
+   ```
+
+4. Configura un servidor web (como Nginx o Apache) para apuntar al directorio `public`.
+
+---
+
+¡El proyecto está listo para ser probado! Si tienes dudas, consulta la documentación o contacta al desarrollador.
